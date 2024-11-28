@@ -32,6 +32,7 @@ struct QueryStats
     unsigned n_cmps_saved = 0; // # cmps saved
     unsigned n_cmps = 0;       // # cmps
     unsigned n_cache_hits = 0; // # cache_hits
+    unsigned n_cache_size = 0; // # cache_size
     unsigned n_hops = 0;       // # search hops
 };
 

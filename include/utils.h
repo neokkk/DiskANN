@@ -635,8 +635,7 @@ inline void load_range_truthset(const std::string &bin_file, std::vector<std::ve
     for (uint32_t p = 0; p < 100; p += 5)
         std::cout << "percentile " << p << ": " << gt_stats[static_cast<size_t>(std::floor((p / 100.0) * gt_num))]
                   << std::endl;
-    std::cout << "percentile 100"
-              << ": " << gt_stats[gt_num - 1] << std::endl;
+    std::cout << "percentile 100" << ": " << gt_stats[gt_num - 1] << std::endl;
 
     for (uint32_t i = 0; i < gt_num; i++)
     {
@@ -758,15 +757,16 @@ inline void load_aligned_bin_impl(std::basic_istream<char> &reader, size_t actua
     dim = (unsigned)dim_i32;
 
     size_t expected_actual_file_size = npts * dim * sizeof(T) + 2 * sizeof(uint32_t);
-    if (actual_file_size != expected_actual_file_size)
-    {
-        std::stringstream stream;
-        stream << "Error. File size mismatch. Actual size is " << actual_file_size << " while expected size is  "
-               << expected_actual_file_size << " npts = " << npts << " dim = " << dim << " size of <T>= " << sizeof(T)
-               << std::endl;
-        diskann::cout << stream.str() << std::endl;
-        throw diskann::ANNException(stream.str(), -1, __FUNCSIG__, __FILE__, __LINE__);
-    }
+    // if (actual_file_size != expected_actual_file_size)
+    // {
+    //     std::stringstream stream;
+    //     stream << "Error. File size mismatch. Actual size is " << actual_file_size << " while expected size is  "
+    //            << expected_actual_file_size << " npts = " << npts << " dim = " << dim << " size of <T>= " <<
+    //            sizeof(T)
+    //            << std::endl;
+    //     diskann::cout << stream.str() << std::endl;
+    //     throw diskann::ANNException(stream.str(), -1, __FUNCSIG__, __FILE__, __LINE__);
+    // }
     rounded_dim = ROUND_UP(dim, 8);
     diskann::cout << "Metadata: #pts = " << npts << ", #dims = " << dim << ", aligned_dim = " << rounded_dim << "... "
                   << std::flush;

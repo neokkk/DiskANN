@@ -3,6 +3,7 @@
 
 #include "common_includes.h"
 #include <boost/program_options.hpp>
+#include <iostream>
 
 #include "index.h"
 #include "disk_utils.h"
@@ -179,7 +180,7 @@ int search_disk_index(diskann::Metric &metric, const std::string &index_path_pre
     std::string recall_string = "Recall@" + std::to_string(recall_at);
     diskann::cout << std::setw(6) << "L" << std::setw(12) << "Beamwidth" << std::setw(16) << "QPS" << std::setw(16)
                   << "Mean Latency" << std::setw(16) << "99.9 Latency" << std::setw(16) << "Mean IOs" << std::setw(16)
-                  << "CPU (s)";
+                  << "CPU (s)" << std::setw(16) << "Cache Hit Ratio";
     if (calc_recall_flag)
     {
         diskann::cout << std::setw(16) << recall_string << std::endl;
@@ -194,7 +195,6 @@ int search_disk_index(diskann::Metric &metric, const std::string &index_path_pre
     std::vector<std::vector<float>> query_result_dists(Lvec.size());
 
     uint32_t optimized_beamwidth = 2;
-
     double best_recall = 0.0;
 
     for (uint32_t test_id = 0; test_id < Lvec.size(); test_id++)
@@ -209,9 +209,10 @@ int search_disk_index(diskann::Metric &metric, const std::string &index_path_pre
 
         if (beamwidth <= 0)
         {
-            diskann::cout << "Tuning beamwidth.." << std::endl;
+            std::cout << "Tuning beamwidth.." << std::endl;
             optimized_beamwidth =
                 optimize_beamwidth(_pFlashIndex, warmup, warmup_num, warmup_aligned_dim, L, optimized_beamwidth);
+            std::cout << "Optimized beamwidth: " << optimized_beamwidth << std::endl;
         }
         else
             optimized_beamwidth = beamwidth;
@@ -270,6 +271,11 @@ int search_disk_index(diskann::Metric &metric, const std::string &index_path_pre
         auto mean_cpuus = diskann::get_mean_stats<float>(stats, query_num,
                                                          [](const diskann::QueryStats &stats) { return stats.cpu_us; });
 
+        auto mean_cache_hit_ratio =
+            diskann::get_mean_stats<float>(stats, query_num, [](const diskann::QueryStats &stats) {
+                return (double)stats.n_cache_hits / stats.n_cache_size;
+            });
+
         double recall = 0;
         if (calc_recall_flag)
         {
@@ -280,7 +286,8 @@ int search_disk_index(diskann::Metric &metric, const std::string &index_path_pre
 
         diskann::cout << std::setw(6) << L << std::setw(12) << optimized_beamwidth << std::setw(16) << qps
                       << std::setw(16) << mean_latency << std::setw(16) << latency_999 << std::setw(16) << mean_ios
-                      << std::setw(16) << mean_cpuus;
+                      << std::setw(16) << mean_cpuus << std::setw(16) << mean_cache_hit_ratio;
+
         if (calc_recall_flag)
         {
             diskann::cout << std::setw(16) << recall << std::endl;

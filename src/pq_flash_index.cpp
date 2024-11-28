@@ -1533,6 +1533,9 @@ void PQFlashIndex<T, LabelT>::cached_beam_search(const T *query1, const uint64_t
                 }
             }
         }
+
+        stats->n_cache_size += cached_nhoods.size();
+
 #ifdef USE_BING_INFRA
         // process each frontier nhood - compute distances to unvisited nodes
         int completedIndex = -1;
