@@ -374,6 +374,8 @@ dist/*
 venv*/**
 *.swp
 
+.ipynb_checkpoints/
+
 gperftools
 
 # Rust
